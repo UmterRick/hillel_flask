@@ -1,5 +1,9 @@
 [tool.poetry]
+<<<<<<< HEAD
 name = "hillel-flask"
+=======
+name = "PythonProject4"
+>>>>>>> 5d80988 (flask project)
 version = "0.1.0"
 description = ""
 authors = ["Your Name <you@example.com>"]
@@ -23,4 +27,8 @@ black = "^25.1.0"
 
 [build-system]
 requires = ["poetry-core"]
+<<<<<<< HEAD
 build-backend = "poetry.core.masonry.api"
+=======
+build-backend = "poetry.core.masonry.api"
+>>>>>>> 5d80988 (flask project)

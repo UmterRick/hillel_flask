@@ -7,4 +7,13 @@ class Student(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+<<<<<<< HEAD
     birth_date = db.Column(db.Date, nullable=False)
+=======
+    birth_date = db.Column(db.Date, nullable=False)
+    ###
+    #last_name = db.Column(db.String(100), nullable=True)
+    course_name = db.Column(db.String(200), nullable=True)
+    photo_url = db.Column(db.String(500), nullable=True)
+    # email= db.Column(db.String(100), nullable=False)
+>>>>>>> 5d80988 (flask project)
