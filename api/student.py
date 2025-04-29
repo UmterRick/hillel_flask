@@ -4,27 +4,18 @@ from database import db
 from models.pydantic.students.student_read import StudentReadModel
 from models.pydantic.students.student_update import StudentUpdateModel
 from models.sqlalchemy.student import Student
-<<<<<<< HEAD
-=======
-from sqlalchemy import or_
 
->>>>>>> 5d80988 (flask project)
+from sqlalchemy import or_
 
 students_bp = Blueprint("students_bp", __name__, url_prefix="/students")
 
 
-<<<<<<< HEAD
-@students_bp.route("/", methods=["GET"])
-def get_all_students():
-    students = Student.query.all()
-    return jsonify({"students": [StudentReadModel.model_validate(s).model_dump(mode="json") for s in students]})
-=======
+
 # @students_bp.route("/", methods=["GET"])
 # def get_all_students():
 #     students = Student.query.all()
 #     return jsonify({"students": [StudentReadModel.model_validate(s).model_dump(mode="json") for s in students]}) #mode="json")
 
->>>>>>> 5d80988 (flask project)
 
 @students_bp.route("/<int:pk>", methods=["GET"])
 def get_student_by_id(pk):
@@ -33,7 +24,6 @@ def get_student_by_id(pk):
         return jsonify({"error": f"Student with id={pk} not found"}), 404
 
     return jsonify(StudentReadModel.model_validate(student).model_dump(mode="json"))
-
 
 
 @students_bp.route("/<int:pk>", methods=["DELETE"])
@@ -64,41 +54,35 @@ def edit_student_by_id(pk):
             setattr(student, field, value)
     db.session.commit()
 
-
-    return jsonify(StudentReadModel.model_validate(student).model_dump(mode="json"))
+    return jsonify(StudentReadModel.model_validate(student).model_dump(mode="json")), 200
 
 
 @students_bp.route("/", methods=["POST"])
 def create_student_by_id():
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": f"No data provided"}), 400
 
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": f"No data provided"}), 400
+        validated_data = StudentUpdateModel.model_validate(data)
+        new_student = Student(**validated_data.model_dump())
 
-    validated_data = StudentUpdateModel.model_validate(data)
-    new_student = Student(**validated_data.model_dump())
+        db.session.add(new_student)
+        db.session.commit()
 
-    db.session.add(new_student)
-    db.session.commit()
+        return jsonify(StudentReadModel.model_validate(new_student).model_dump(mode="json")), 201
 
-
-    return jsonify(StudentReadModel.model_validate(new_student).model_dump(mode="json")), 201
-<<<<<<< HEAD
-=======
 
 @students_bp.route("/", methods=['GET'])
 def search_student():
-    name_filter=request.args.get('name', '').strip()
+    name_filter = request.args.get('name', '').strip()
     if name_filter:
-        students=Student.query.filter(or_(Student.name.ilike(f'%{name_filter}%')
-            )
-        ).all()
+        students = Student.query.filter(or_(Student.name.ilike(f'%{name_filter}%')
+                                                )
+                                            ).all()
     else:
         students = Student.query.all()
 
     print(students)
     return jsonify({
             'students': [StudentReadModel.model_validate(student).model_dump() for student in students]
-    })
-
->>>>>>> 5d80988 (flask project)
+        })
