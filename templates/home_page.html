@@ -16,6 +16,25 @@
 <div class="container mt-4">
     <h2>Students List</h2>
 
+<<<<<<< HEAD
+=======
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" id="searchName" class="form-control" placeholder="Search by name...">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" onclick="searchStudents()">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <button class="btn btn-secondary" type="button" onclick="clearSearch()">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+>>>>>>> 5d80988 (flask project)
     <!-- Add student form -->
     <div class="card mt-4">
         <div class="card-header">Add a New Student</div>
@@ -29,19 +48,44 @@
                     <label for="birth_date">Birth Date:</label>
                     <input type="date" class="form-control" id="birth_date" required>
                 </div>
+<<<<<<< HEAD
+=======
+                <div class="form-group">
+                    <label for="course_name">Course name:</label>
+                    <input type="text" class="form-control" id="course_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="photo_url">Photo URL:</label>
+                    <input type="url" class="form-control" id="photo_url" required>
+                </div>
+>>>>>>> 5d80988 (flask project)
                 <button type="submit" class="btn btn-primary">Add Student</button>
             </form>
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- List of students in a table -->
     <h4 class="mt-4">List of students:</h4>
+=======
+
+
+
+    <!-- List of students in a table -->
+    <h4 class="mt-4">LIST OF CONTENT</h4>
+>>>>>>> 5d80988 (flask project)
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Student Id</th>
                 <th>Name</th>
                 <th>Birth Date</th>
+<<<<<<< HEAD
+=======
+                <th>Age</th>
+                <th>Course Name</th>
+                <th>Photo URL</th>
+>>>>>>> 5d80988 (flask project)
                 <th>Actions</th>
             </tr>
         </thead>
@@ -51,6 +95,12 @@
     </table>
 </div>
 
+<<<<<<< HEAD
+=======
+
+
+
+>>>>>>> 5d80988 (flask project)
 <!-- Edit student modal -->
 <div class="modal" tabindex="-1" role="dialog" id="editStudentModal">
   <div class="modal-dialog" role="document">
@@ -63,7 +113,11 @@
       </div>
       <div class="modal-body">
         <form id="editStudentForm">
+<<<<<<< HEAD
             <input type="hidden" id="editStudentId">
+=======
+            <input type="hidden"id="editStudentId">
+>>>>>>> 5d80988 (flask project)
             <div class="form-group">
                 <label for="editStudentName">Name:</label>
                 <input type="text" class="form-control" id="editStudentName" required>
@@ -72,6 +126,17 @@
                 <label for="editStudentBirthDate">Birth Date:</label>
                 <input type="date" class="form-control" id="editStudentBirthDate" required>
             </div>
+<<<<<<< HEAD
+=======
+            <div class="form-group">
+                <label for="editCourseName">Course:</label>
+                <input type="text" class="form-control" id="editCourseName" required>
+            </div>
+            <div class="form-group">
+                <label for="editPhotoURL">Photo URL:</label>
+                <input type="text" class="form-control" id="editPhotoURL" required>
+            </div>
+>>>>>>> 5d80988 (flask project)
         </form>
       </div>
       <div class="modal-footer">
@@ -83,28 +148,112 @@
 </div>
 
 <script>
+<<<<<<< HEAD
+=======
+
+        // Add these new functions for search
+    function searchStudents() {
+        const searchTerm = $('#searchName').val().trim();
+        $.getJSON(`/students?name=${encodeURIComponent(searchTerm)}`)
+            .done(function(data) {
+                updateStudentsTable(data.students);
+            })
+            .fail(function(error) {
+                console.error('Search failed:', error);
+            });
+    }
+
+    function clearSearch() {
+        $('#searchName').val('');
+        fetchStudents();
+    }
+
+>>>>>>> 5d80988 (flask project)
     // Update student
     function updateStudent(id) {
         // Fetch the current details of the student to pre-populate the form.
         // This assumes you have a backend route to get details of a single student.
         $.getJSON(`/students/${id}`, function(data) {
+<<<<<<< HEAD
             $('#editStudentId').val(data.student_id);
             $('#editStudentName').val(data.name);
             $('#editStudentBirthDate').val(data.birth_date);
+=======
+            $('#editStudentId').val(data.id);
+            $('#editStudentName').val(data.name);
+            $('#editStudentBirthDate').val(data.birth_date);
+            $('#editCourseName').val(data.course_name);
+            $('#editPhotoURL').val(data.photo_url);
+>>>>>>> 5d80988 (flask project)
             $('#editStudentModal').modal('show');
         });
     }
 
+<<<<<<< HEAD
     function submitEditStudent() {
         const updatedStudent = {
             name: $('#editStudentName').val(),
             birth_date: $('#editStudentBirthDate').val()
+=======
+        function updateStudentsTable(students) {
+        $('#studentsList').empty();
+        students.forEach(student => {
+            const photoHtml = student.photo_url
+                ? `<img src="${student.photo_url}" alt="Student photo" style="width: 50px; height: 50px; object-fit: cover;">`
+                : 'No photo';
+
+            $('#studentsList').append(`
+                <tr>
+                    <td>${student.student_id}</td>
+                    <td>${student.name}</td>
+
+                    <td>${student.birth_date}</td>
+                    <td>${student.age}</td>
+                    <td>${student.course_name}</td>
+                    <td>${photoHtml}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="updateStudent(${student.student_id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.student_id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    // Add event listener for Enter key in search input
+    $('#searchName').on('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchStudents();
+        }
+    });
+
+
+
+    function submitEditStudent() {
+        const updatedStudent = {
+
+            name: $('#editStudentName').val(),
+            birth_date: $('#editStudentBirthDate').val(),
+            course_name: $('#editCourseName').val(),
+            photo_url: $('#editPhotoURL').val()
+>>>>>>> 5d80988 (flask project)
         };
 
         const studentId = $('#editStudentId').val();
 
+<<<<<<< HEAD
         $.ajax({
             url: `/students/${studentId}`,
+=======
+
+
+        $.ajax({
+            url: `/students/${student_id}`,
+>>>>>>> 5d80988 (flask project)
             type: 'PATCH',
             data: JSON.stringify(updatedStudent),
             contentType: 'application/json',
@@ -127,6 +276,12 @@
                         <td>${student.student_id}</td>
                         <td>${student.name}</td>
                         <td>${student.birth_date}</td>
+<<<<<<< HEAD
+=======
+                        <td>${student.age}</td>
+                        <td>${student.course_name}</td>
+                        <td>${student.photo_url}</td>
+>>>>>>> 5d80988 (flask project)
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="updateStudent(${student.student_id})">Update</button>
                             <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.student_id})">Delete</button>
@@ -142,7 +297,13 @@
         e.preventDefault();
         const newStudent = {
             name: $('#name').val(),
+<<<<<<< HEAD
             birth_date: $('#birth_date').val()
+=======
+            birth_date: $('#birth_date').val(),
+            course_name: $('#course_name').val(),
+            photo_url: $('#photo_url').val()
+>>>>>>> 5d80988 (flask project)
         };
         $.ajax({
             url: '/students',
