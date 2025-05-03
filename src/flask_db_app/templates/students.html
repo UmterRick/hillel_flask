@@ -29,24 +29,48 @@
                     <label for="birth_date">Birth Date:</label>
                     <input type="date" class="form-control" id="birth_date" required>
                 </div>
+                <div class="form-group">
+                    <label for="course_name">Course Name:</label>
+                    <input type="text" class="form-control" id="course_name" placeholder="Flask Dev" required>
+                </div>
+                <div class="form-group">
+                    <label for="photo_url">Photo URL:</label>
+                    <input type="url" class="form-control" id="photo_url" placeholder="https://picsum.photos/seed/name/100" required>
+                </div>
                 <button type="submit" class="btn btn-primary">Add Student</button>
             </form>
         </div>
     </div>
 
+    <!-- Search form -->
+<form method="get" action="/students_ui" class="form-inline mb-3">
+    <input type="text" name="search_name" class="form-control mr-2" placeholder="Enter name to search">
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+</form>
+
     <!-- List of students in a table -->
     <h4 class="mt-4">List of students:</h4>
+    <p>Всього студентів: {{ students|length }}</p>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Student Id</th>
                 <th>Name</th>
                 <th>Birth Date</th>
-                <th>Actions</th>
+                <th>Course</th>
+                <th>Photo</th>
             </tr>
         </thead>
         <tbody id="studentsList">
-            <!-- Rows will be populated by jQuery -->
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ student.birth_date }}</td>
+                <td>{{ student.course_name }}</td>
+                <td><img src="{{ student.photo_url }}" alt="photo" width="50"></td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 </div>
@@ -110,48 +134,28 @@
             contentType: 'application/json',
             success: function() {
                 $('#editStudentModal').modal('hide');
-                fetchStudents();
+                location.reload();
             }
         });
     }
 
-
-    // Fetch all students and display them
-    function fetchStudents() {
-        $.getJSON('/students', function(data) {
-            $('#studentsList').empty();
-            data.students.forEach(student => {
-                $('#studentsList').append(`
-                    <tr>
-
-                        <td>${student.student_id}</td>
-                        <td>${student.name}</td>
-                        <td>${student.birth_date}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="updateStudent(${student.student_id})">Update</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.student_id})">Delete</button>
-                        </td>
-                    </tr>
-                `);
-            });
-        });
-    }
 
     // Add new student
     $('#addStudentForm').on('submit', function(e) {
         e.preventDefault();
         const newStudent = {
             name: $('#name').val(),
-            birth_date: $('#birth_date').val()
+            birth_date: $('#birth_date').val(),
+            course_name: $('#course_name').val(),
+            photo_url: $('#photo_url').val()
         };
         $.ajax({
-            url: '/students',
+            url: '/add_student',
             type: 'POST',
             data: JSON.stringify(newStudent),
             contentType: 'application/json',
             success: function() {
-                fetchStudents();
-                $('#addStudentForm')[0].reset();
+                location.reload();
             }
         });
     });
@@ -163,14 +167,11 @@
                 url: `/students/${id}`,
                 type: 'DELETE',
                 success: function() {
-                    fetchStudents();
+                    location.reload();
                 }
             });
         }
     }
-
-    // Initial fetch
-    fetchStudents();
 
 
 </script>
