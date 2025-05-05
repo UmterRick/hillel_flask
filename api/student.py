@@ -1,17 +1,33 @@
 from flask import Blueprint, jsonify, request
+from flask import render_template
+
 
 from database import db
+from models.pydantic.students.student_create import StudentCreateModel
 from models.pydantic.students.student_read import StudentReadModel
 from models.pydantic.students.student_update import StudentUpdateModel
 from models.sqlalchemy.student import Student
 
 students_bp = Blueprint("students_bp", __name__, url_prefix="/students")
 
-
 @students_bp.route("/", methods=["GET"])
 def get_all_students():
+    name_query = request.args.get("name")
+    query = Student.query
+    if name_query:
+        query = query.filter(Student.name.ilike(f"%{name_query}%"))
+    students = query.all()
+    return jsonify({
+        "students": [
+            StudentReadModel.model_validate(s).model_dump(mode="json")
+            for s in students
+        ]
+    })
     students = Student.query.all()
     return jsonify({"students": [StudentReadModel.model_validate(s).model_dump(mode="json") for s in students]})
+
+
+
 
 @students_bp.route("/<int:pk>", methods=["GET"])
 def get_student_by_id(pk):
@@ -20,7 +36,19 @@ def get_student_by_id(pk):
         return jsonify({"error": f"Student with id={pk} not found"}), 404
 
     return jsonify(StudentReadModel.model_validate(student).model_dump(mode="json"))
+##
+#Добавляємо ендпоінт для пошуку за ім'ям:
+@students_bp.route("/search", methods=["GET"])
+def get_student_by_name():
+    name_query = request.args.get("name")
+    if not name_query:
+        return jsonify({"error": "No search parameter provided"}), 400
 
+    students = Student.query.filter(Student.name.ilike(f"%{name_query}%")).all()
+
+    return jsonify({
+        "results": [StudentReadModel.model_validate(s).model_dump(mode="json") for s in students]
+    })
 
 
 @students_bp.route("/<int:pk>", methods=["DELETE"])
@@ -33,7 +61,6 @@ def delete_student_by_id(pk):
     db.session.commit()
 
     return jsonify({"message": "Student was successfully deleted"}), 204
-
 
 @students_bp.route("/<int:pk>", methods=["PATCH"])
 def edit_student_by_id(pk):
@@ -51,9 +78,7 @@ def edit_student_by_id(pk):
             setattr(student, field, value)
     db.session.commit()
 
-
     return jsonify(StudentReadModel.model_validate(student).model_dump(mode="json"))
-
 
 @students_bp.route("/", methods=["POST"])
 def create_student_by_id():
@@ -62,11 +87,27 @@ def create_student_by_id():
     if not data:
         return jsonify({"error": f"No data provided"}), 400
 
-    validated_data = StudentUpdateModel.model_validate(data)
+    validated_data = StudentCreateModel.model_validate(data)
     new_student = Student(**validated_data.model_dump())
 
     db.session.add(new_student)
     db.session.commit()
 
-
     return jsonify(StudentReadModel.model_validate(new_student).model_dump(mode="json")), 201
+
+
+
+#Добавляємо ендпоінт для рендеру HTML-шаблону:
+@students_bp.route("/search_page", methods=["GET"])
+def search_students_page():
+    name_query = request.args.get("name")
+    students = []
+
+    if name_query:
+        students = Student.query.filter(Student.name.ilike(f"%{name_query}%")).all()
+
+    return render_template("search.html", results=students)
+
+
+
+

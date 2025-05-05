@@ -5,6 +5,12 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
+#Додано посилання на папку api, як кореневу для цього проекту:
+packages = [
+    {include = "api"}
+]
+
+
 [tool.poetry.dependencies]
 python = "^3.11"
 flask = "^3.1.0"

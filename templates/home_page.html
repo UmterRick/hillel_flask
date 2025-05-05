@@ -29,10 +29,28 @@
                     <label for="birth_date">Birth Date:</label>
                     <input type="date" class="form-control" id="birth_date" required>
                 </div>
+                <div class="form-group">
+                    <label for="course">Course:</label>
+                    <input type="text" class="form-control" id="course" placeholder="Course" required>
+                </div>
+                <div class="form-group">
+                    <label for="photoUrl">Photo:</label>
+                    <input type="text" class="form-control" id="photoUrl" placeholder="PhotoUrl" required>
+                </div>
                 <button type="submit" class="btn btn-primary">Add Student</button>
             </form>
         </div>
     </div>
+
+    <!-- Search student form -->
+    <div class="mt-3">
+        <form id="searchForm" class="form-inline">
+            <input type="text" class="form-control mr-2" id="searchName" placeholder="Search by name">
+            <button type="submit" class="btn btn-secondary">Search</button>
+            <button type="button" class="btn btn-light ml-2" id="clearSearch">Clear</button>
+        </form>
+    </div>
+
 
     <!-- List of students in a table -->
     <h4 class="mt-4">List of students:</h4>
@@ -42,6 +60,9 @@
                 <th>Student Id</th>
                 <th>Name</th>
                 <th>Birth Date</th>
+                <th>Age</th>
+                <th>Course</th>
+                <th>Photo</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -72,6 +93,14 @@
                 <label for="editStudentBirthDate">Birth Date:</label>
                 <input type="date" class="form-control" id="editStudentBirthDate" required>
             </div>
+            <div class="form-group">
+                <label for="editStudentCourse">Course</label>
+                <input type="text" class="form-control" id="editStudentCourse">
+            </div>
+            <div class="form-group">
+                <label for="editStudentPhotoUrl">Photo URL</label>
+                <input type="url" class="form-control" id="editStudentPhotoUrl">
+            </div>
         </form>
       </div>
       <div class="modal-footer">
@@ -91,6 +120,8 @@
             $('#editStudentId').val(data.student_id);
             $('#editStudentName').val(data.name);
             $('#editStudentBirthDate').val(data.birth_date);
+            $('#editStudentCourse').val(data.course);
+            $('#editStudentPhotoUrl').val(data.photo_url);
             $('#editStudentModal').modal('show');
         });
     }
@@ -98,7 +129,9 @@
     function submitEditStudent() {
         const updatedStudent = {
             name: $('#editStudentName').val(),
-            birth_date: $('#editStudentBirthDate').val()
+            birth_date: $('#editStudentBirthDate').val(),
+            course: $('#editStudentCourse').val(),
+            photo_url: $('#editStudentPhotoUrl').val()
         };
 
         const studentId = $('#editStudentId').val();
@@ -117,16 +150,26 @@
 
 
     // Fetch all students and display them
-    function fetchStudents() {
-        $.getJSON('/students', function(data) {
+    function fetchStudents(nameFilter = '') {
+        let url = '/students';
+        if (nameFilter) {
+            url += `?name=${encodeURIComponent(nameFilter)}`;
+        }
+
+        $.getJSON(url, function(data) {
             $('#studentsList').empty();
             data.students.forEach(student => {
                 $('#studentsList').append(`
                     <tr>
-
                         <td>${student.student_id}</td>
                         <td>${student.name}</td>
                         <td>${student.birth_date}</td>
+                        <td>${student.age}</td>
+                        <td>${student.course || ''}</td>
+                        <td>
+                            ${student.photo_url
+                                ? `<img src="${student.photo_url}" alt="photo" width="50" height="50">`
+                                : '—'}
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="updateStudent(${student.student_id})">Update</button>
                             <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.student_id})">Delete</button>
@@ -137,12 +180,28 @@
         });
     }
 
+
+    // Processing search form submission
+    $('#searchForm').on('submit', function(e) {
+        e.preventDefault();
+        const name = $('#searchName').val();
+        fetchStudents(name);
+    });
+
+    // Clear search button
+    $('#clearSearch').on('click', function() {
+        $('#searchName').val('');
+        fetchStudents();
+    });
+
     // Add new student
     $('#addStudentForm').on('submit', function(e) {
         e.preventDefault();
         const newStudent = {
             name: $('#name').val(),
-            birth_date: $('#birth_date').val()
+            birth_date: $('#birth_date').val(),
+            course: $('#course').val(),
+            photo_url: $('#photoUrl').val(),
         };
         $.ajax({
             url: '/students',
