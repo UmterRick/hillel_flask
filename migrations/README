@@ -1,0 +1,296 @@
+Single-database configuration for Flask.
+<<<<<<< HEAD
+=======
+
+
+rm -f migrations/versions/*.py
+
+flask db migrate -m "Add course_name and photo_url to student"
+
+
+from flask import request, jsonify
+from sqlalchemy import or_
+
+@app.route('/students', methods=['GET'])
+def get_students():
+    name_filter = request.args.get('name', '').strip()
+
+    if name_filter:
+        # Search in both first_name and last_name
+        students = Student.query.filter(
+            or_(
+                Student.first_name.ilike(f'%{name_filter}%'),
+                Student.last_name.ilike(f'%{name_filter}%')
+            )
+        ).all()
+    else:
+        students = Student.query.all()
+
+    return jsonify({
+        'students': [StudentReadModel.from_orm(student).model_dump() for student in students]
+    })
+
+
+<!-- Add search form -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" id="searchName" class="form-control" placeholder="Search by name...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" onclick="searchStudents()">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <button class="btn btn-secondary" type="button" onclick="clearSearch()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Existing table structure -->
+<table class="table table-striped">
+    <!-- ... rest of your table code ... -->
+</table>
+
+<script>
+// Add these new functions for search
+function searchStudents() {
+    const searchTerm = $('#searchName').val().trim();
+    $.getJSON(`/students?name=${encodeURIComponent(searchTerm)}`, function(data) {
+        updateStudentsTable(data.students);
+    });
+}
+
+function clearSearch() {
+    $('#searchName').val('');
+    fetchStudents();
+}
+
+// Modify your existing fetchStudents function to use a common update function
+function fetchStudents() {
+    $.getJSON('/students', function(data) {
+        updateStudentsTable(data.students);
+    });
+}
+
+// Create a new function to update the table
+function updateStudentsTable(students) {
+    $('#studentsList').empty();
+    students.forEach(student => {
+        const photoHtml = student.photo_url
+            ? `<img src="${student.photo_url}" alt="Student photo" style="width: 50px; height: 50px; object-fit: cover;">`
+            : 'No photo';
+
+        $('#studentsList').append(`
+            <tr>
+                <td>${student.id}</td>
+                <td>${student.first_name}</td>
+
+                <td>${student.birth_date}</td>
+                <td>${student.age}</td>
+                <td>${student.course_name}</td>
+                <td>${photoHtml}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="updateStudent(${student.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteStudent(${student.id})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            </tr>
+        `);
+    });
+}
+
+// Add event listener for Enter key in search input
+$('#searchName').on('keyup', function(e) {
+    if (e.key === 'Enter') {
+        searchStudents();
+    }
+});
+
+// Rest of your existing JavaScript code...
+</script>
+
+
+
+Security Concerns:
+
+The code directly interpolates student IDs into HTML using template literals, which could be vulnerable to XSS attacks. Consider using proper HTML escaping.
+
+Photo URLs are directly inserted into img tags without validation, which could be a security risk.
+
+Inconsistencies:
+
+There are two different updateStudentsTable functions with different implementations
+
+Student object properties are inconsistent ( first_name/ last_name vs name)
+
+Some places use student_id while others use id
+
+Code Structure Issues:
+
+The $updateStudentsTable() call in the updateStudent function appears to have a typo ($ prefix)
+
+There's duplicate code for rendering student rows in different functions
+
+Accessibility Issues:
+
+Modal dialog could use better ARIA attributes
+
+Image elements need better alt text descriptions
+
+Form labels could be more descriptive
+
+Here's how you could improve some of these issues:
+
+// Safer student row rendering with XSS protection
+function renderStudentRow(student) {
+    const escapedName = escapeHtml(student.name);
+    const escapedCourseName = escapeHtml(student.course_name);
+    const photoUrl = student.photo_url ? escapeHtml(student.photo_url) : '';
+
+    return `
+        <tr>
+            <td>${student.student_id}</td>
+            <td>${escapedName}</td>
+            <td>${student.birth_date}</td>
+            <td>${student.age}</td>
+            <td>${escapedCourseName}</td>
+            <td>${photoUrl ?
+                `<img src="${photoUrl}"
+                     alt="Photo of ${escapedName}"
+                     style="width: 50px; height: 50px; object-fit: cover;"
+                     onerror="this.onerror=null; this.src='default-photo.png';">`
+                : 'No photo available'}</td>
+            <td>
+                <button class="btn btn-warning btn-sm"
+                        onclick="updateStudent(${student.student_id})"
+                        aria-label="Edit ${escapedName}'s information">
+                    <i class="fas fa-edit" aria-hidden="true"></i> Edit
+                </button>
+                <button class="btn btn-danger btn-sm"
+                        onclick="deleteStudent(${student.student_id})"
+                        aria-label="Delete ${escapedName}'s record">
+                    <i class="fas fa-trash" aria-hidden="true"></i> Delete
+                </button>
+            </td>
+        </tr>
+    `;
+}
+
+// Helper function to escape HTML
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Unified updateStudentsTable function
+function updateStudentsTable(students) {
+    const tbody = document.getElementById('studentsList');
+    tbody.innerHTML = students.map(student => renderStudentRow(student)).join('');
+}
+
+Copy
+
+Insert at cursor
+javascript
+For the modal dialog, improve accessibility:
+
+<div class="modal" tabindex="-1" role="dialog" id="editStudentModal"
+     aria-labelledby="editStudentModalTitle" aria-describedby="editStudentModalDescription">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editStudentModalTitle">Edit Student Information</h5>
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close dialog">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <!-- Rest of the modal content -->
+        </div>
+    </div>
+</div>
+
+Copy
+
+Insert at cursor
+html
+Additional recommendations:
+
+Add input validation before submitting forms
+
+Implement error handling for AJAX calls
+
+Use consistent property names throughout the application
+
+Add loading states for async operations
+
+Consider implementing CSRF protection for forms
+
+Add proper error messages for failed operations
+
+Implement proper form validation feedback
+
+Consider adding confirmation dialogs for important actions
+
+
+
+
+###???
+function searchStudents() {
+    const searchTerm = $('#searchName').val().trim();
+
+    // Only perform search if there's actually a search term
+    if (searchTerm) {
+        $.getJSON(`/students?name=${encodeURIComponent(searchTerm)}`, function(data) {
+            if (data.students && data.students.length > 0) {
+                updateStudentsTable(data.students);
+            } else {
+                // Handle no results found
+                $('#studentsList').empty();
+                $('#studentsList').append(`
+                    <tr>
+                        <td colspan="7" class="text-center">No students found matching "${searchTerm}"</td>
+                    </tr>
+                `);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            // Handle errors
+            console.error('Search failed:', errorThrown);
+            alert('Error performing search. Please try again.');
+        });
+    } else {
+        // If search is empty, show all students
+        fetchStudents();
+    }
+}
+
+// Make sure you have these event listeners:
+$(document).ready(function() {
+    // Search when Enter key is pressed
+    $('#searchName').on('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchStudents();
+        }
+    });
+
+    // Search when search button is clicked
+    $('#searchButton').on('click', function() {
+        searchStudents();
+    });
+
+    // Clear search and show all students
+    $('#clearSearch').on('click', function() {
+        $('#searchName').val('');
+        fetchStudents();
+    });
+});
+>>>>>>> 5d80988 (flask project)
