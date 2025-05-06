@@ -6,5 +6,6 @@ CREATE TABLE students(
 
 INSERT INTO students (name, birth_date) VALUES ('John Doe', '2000-01-01');
 
+
 ALTER TABLE students ADD COLUMN course_name Varchar(500), photo_url Varchar(100)
 

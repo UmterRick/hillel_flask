@@ -1,6 +1,5 @@
 
 from flask import jsonify, Blueprint, render_template
-
 from database import db
 from models.sqlalchemy.student import Student
 from markupsafe import escape

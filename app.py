@@ -5,6 +5,7 @@ from api.student import students_bp
 from database import migrate, db
 from settings import settings
 
+
 config_variable_name = 'My App'
 default_config_path = os.path.join(os.path.dirname(__file__), 'config/local.py')
 os.environ.setdefault(config_variable_name, default_config_path)

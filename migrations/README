@@ -243,7 +243,6 @@ Consider adding confirmation dialogs for important actions
 
 
 
-
 ###???
 function searchStudents() {
     const searchTerm = $('#searchName').val().trim();

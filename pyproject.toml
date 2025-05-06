@@ -15,7 +15,6 @@ flask-migrate = "^4.1.0"
 pydantic-settings = "^2.9.1"
 alchemy = "^20.5"
 
-
 [tool.poetry.group.prod.dependencies]
 psycopg = "^3.2.6"
 

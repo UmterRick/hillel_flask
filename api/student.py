@@ -5,6 +5,7 @@ from models.pydantic.students.student_update import StudentUpdateModel
 from models.sqlalchemy.student import Student
 from sqlalchemy import or_
 
+
 students_bp = Blueprint("students_bp", __name__, url_prefix="/students")
 
 # Fix 1: Add the GET route for individual student

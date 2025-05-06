@@ -18,7 +18,6 @@ Start own development
 
 
 
-
 =======
 # PythonProject4
 A simple Flask app for managing student data.
