@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 # Install poetry
 pip install poetry
 
 install flask
 install flask-sqlalchemy (Database ORM)
 install flask-migrate (Alembic for Database version system, migration)
+
 
 1) Create Flask App
 2) Config App (specify db url and others settings...)
@@ -56,5 +56,5 @@ flask db migrate -m "add course_name and photo_url to student"
 
 flask db upgrade
 
->>>>>>> 5d80988 (flask project)
+
 

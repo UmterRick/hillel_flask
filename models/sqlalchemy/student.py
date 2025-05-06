@@ -13,3 +13,4 @@ class Student(db.Model):
     course_name = db.Column(db.String(200), nullable=True)
     photo_url = db.Column(db.String(500), nullable=True)
     # email= db.Column(db.String(100), nullable=False)
+

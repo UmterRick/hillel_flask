@@ -1,5 +1,4 @@
 CREATE TABLE students(
-
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     birth_date DATE NOT NULL

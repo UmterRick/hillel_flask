@@ -1,7 +1,5 @@
 import os
-
 from flask import Flask
-
 from api.routes import bp
 from api.student import students_bp
 from database import migrate, db

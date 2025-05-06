@@ -1,5 +1,6 @@
 from api import app
 
+
 def main():
     app_config={
         'DEBUG': True

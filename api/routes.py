@@ -1,9 +1,11 @@
-from markupsafe import escape
-#ADD THE ESCAPE##
+
 from flask import jsonify, Blueprint, render_template
 
 from database import db
 from models.sqlalchemy.student import Student
+from markupsafe import escape
+#ADD THE ESCAPE##
+
 
 bp = Blueprint("main_bp", __name__, url_prefix="/")
 
