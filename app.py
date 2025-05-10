@@ -19,6 +19,21 @@ def create_app():
     app.register_blueprint(students_bp)
     init_app(app)
 
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return jsonify({"status": "ok"}), 200
+
+    @app.route('/students', methods=['GET'])
+    def get_students():
+        db_session: Session = db.session
+        name_filter = request.args.get('name')
+        query = select(Student)
+        if name_filter:
+            query = query.where(Student.name.ilike(f"%{name_filter}%"))
+        students = db_session.scalars(query).all()
+        student_models = [StudentRead.from_orm(student).dict() for student in students]
+        return jsonify(student_models)
+
     return app
 
 
